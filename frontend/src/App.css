@@ -1,0 +1,60 @@
+.dashboard {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: left;
+  font-family: system-ui, sans-serif;
+  color: #e5e7eb;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-header p {
+  color: #9ca3af;
+  margin: 0;
+}
+
+.error {
+  color: #f87171;
+}
+
+.mines-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1f2937;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mines-table th,
+.mines-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #374151;
+}
+
+.mines-table th {
+  background: #111827;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #9ca3af;
+}
+
+.mines-table tr:hover {
+  background: #273449;
+}
+
+.risk-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
