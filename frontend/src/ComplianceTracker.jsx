@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 
 const API_URL = 'http://localhost:5000';
 
-function ComplianceTracker() {
+function ComplianceTracker({ mineFilter }) {
   const [compliance, setCompliance] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`${API_URL}/api/compliance`)
       .then((res) => res.json())
       .then((data) => {
@@ -18,8 +19,10 @@ function ComplianceTracker() {
   const statusColor = (status) => {
     if (status === 'overdue') return '#e11d48';
     if (status === 'completed') return '#22c55e';
-    return '#eab308'; // pending / in_progress
+    return '#eab308';
   };
+
+  const visible = mineFilter ? compliance.filter((c) => c.mine_id === mineFilter) : compliance;
 
   if (loading) return <p>Loading compliance data...</p>;
 
@@ -29,6 +32,7 @@ function ComplianceTracker() {
         <thead>
           <tr>
             <th>Status</th>
+            <th>Mine</th>
             <th>Category</th>
             <th>Requirement</th>
             <th>Regulation</th>
@@ -36,7 +40,7 @@ function ComplianceTracker() {
           </tr>
         </thead>
         <tbody>
-          {compliance.map((item) => (
+          {visible.map((item) => (
             <tr key={item.id}>
               <td>
                 <span
@@ -52,6 +56,7 @@ function ComplianceTracker() {
                   {item.status}
                 </span>
               </td>
+              <td>{item.mines?.name || '—'}</td>
               <td style={{ textTransform: 'capitalize' }}>{item.category}</td>
               <td>{item.title}</td>
               <td>{item.regulation_ref}</td>
