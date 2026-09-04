@@ -6,8 +6,7 @@ import InspectionForm from './InspectionForm';
 import AlertsPanel from './AlertsPanel';
 import ViolationsPanel from './ViolationsPanel';
 import OCRUpload from './OCRUpload';
-
-const API_URL = 'http://localhost:5000';
+import { API_URL } from './config'
 
 const ROLE_TABS = {
   mine_official: ['dashboard', 'compliance', 'inspection', 'ocr', 'alerts', 'violations'],

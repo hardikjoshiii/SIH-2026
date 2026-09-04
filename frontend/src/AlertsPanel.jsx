@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-
-const API_URL = 'http://localhost:5000';
+import { API_URL } from './config';
 
 function AlertsPanel({ mineFilter, readOnly }) {
   const [alerts, setAlerts] = useState([]);

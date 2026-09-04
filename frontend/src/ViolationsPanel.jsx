@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { API_URL } from './config';
 
-const API_URL = 'http://localhost:5000';
 
 function ViolationsPanel({ mineFilter, readOnly }) {
   const [violations, setViolations] = useState([]);
