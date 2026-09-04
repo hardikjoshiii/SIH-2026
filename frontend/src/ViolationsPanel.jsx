@@ -7,12 +7,22 @@ function ViolationsPanel({ mineFilter, readOnly }) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
+  const [error, setError] = useState(null);
+
   const load = () => {
     setLoading(true);
     fetch(`${API_URL}/api/violations`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Server error');
+        return res.json();
+      })
       .then((data) => {
         setViolations(data);
+        setLoading(false);
+        setError(null);
+      })
+      .catch(() => {
+        setError('Could not load violations. Is the backend running?');
         setLoading(false);
       });
   };
@@ -34,15 +44,16 @@ function ViolationsPanel({ mineFilter, readOnly }) {
   };
 
   const severityColor = (s) => {
-    if (s === 'critical') return '#e11d48';
-    if (s === 'high') return '#f97316';
-    if (s === 'medium') return '#eab308';
-    return '#22c55e';
+    if (s === 'critical') return 'var(--risk-critical)';
+    if (s === 'high') return 'var(--risk-high)';
+    if (s === 'medium') return 'var(--risk-medium)';
+    return 'var(--risk-low)';
   };
 
   const visible = mineFilter ? violations.filter((v) => v.mine_id === mineFilter) : violations;
 
-  if (loading) return <p>Loading violations...</p>;
+  if (loading) return <p className="hint">Loading violations...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
     <div>

@@ -5,26 +5,36 @@ const API_URL = 'http://localhost:5000';
 function ComplianceTracker({ mineFilter }) {
   const [compliance, setCompliance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     fetch(`${API_URL}/api/compliance`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Server error');
+        return res.json();
+      })
       .then((data) => {
         setCompliance(data);
+        setLoading(false);
+        setError(null);
+      })
+      .catch(() => {
+        setError('Could not load compliance data. Is the backend running?');
         setLoading(false);
       });
   }, []);
 
   const statusColor = (status) => {
-    if (status === 'overdue') return '#e11d48';
-    if (status === 'completed') return '#22c55e';
-    return '#eab308';
+    if (status === 'overdue') return 'var(--risk-critical)';
+    if (status === 'completed') return 'var(--risk-low)';
+    return 'var(--risk-medium)';
   };
 
   const visible = mineFilter ? compliance.filter((c) => c.mine_id === mineFilter) : compliance;
 
-  if (loading) return <p>Loading compliance data...</p>;
+  if (loading) return <p className="hint">Loading compliance data...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
     <div>

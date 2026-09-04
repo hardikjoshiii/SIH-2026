@@ -7,12 +7,22 @@ function AlertsPanel({ mineFilter, readOnly }) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
+  const [error, setError] = useState(null);
+
   const loadAlerts = () => {
     setLoading(true);
     fetch(`${API_URL}/api/alerts`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Server error');
+        return res.json();
+      })
       .then((data) => {
         setAlerts(data);
+        setLoading(false);
+        setError(null);
+      })
+      .catch(() => {
+        setError('Could not load alerts. Is the backend running?');
         setLoading(false);
       });
   };
@@ -34,15 +44,16 @@ function AlertsPanel({ mineFilter, readOnly }) {
   };
 
   const typeColor = (type) => {
-    if (type === 'overdue_compliance') return '#e11d48';
-    if (type === 'high_risk') return '#f97316';
-    if (type === 'violation_raised') return '#eab308';
-    return '#3b82f6';
+    if (type === 'overdue_compliance') return 'var(--risk-critical)';
+    if (type === 'high_risk') return 'var(--risk-high)';
+    if (type === 'violation_raised') return 'var(--risk-medium)';
+    return 'var(--accent)';
   };
 
   const visible = mineFilter ? alerts.filter((a) => a.mine_id === mineFilter) : alerts;
 
-  if (loading) return <p>Loading alerts...</p>;
+  if (loading) return <p className="hint">Loading alerts...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
     <div>

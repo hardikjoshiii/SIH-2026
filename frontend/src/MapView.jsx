@@ -2,10 +2,10 @@ import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const riskColor = (level) => {
-  if (level === 'critical') return '#e11d48';
-  if (level === 'high') return '#f97316';
-  if (level === 'medium') return '#eab308';
-  return '#22c55e';
+  if (level === 'critical') return '#C2410C';
+  if (level === 'high') return '#D97706';
+  if (level === 'medium') return '#CA8A04';
+  return '#4D7C0F';
 };
 
 // Supabase stores location as PostGIS geography (WKB hex string).

@@ -3,18 +3,19 @@
 // Includes: mines, compliance, inspections, and AI risk engine
 // ============================================================
 
-   require('dotenv').config();
-   const express = require('express');
-   const cors = require('cors');
-   const multer = require('multer');
-   const Tesseract = require('tesseract.js');
-   const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const Tesseract = require('tesseract.js');
+const { createClient } = require('@supabase/supabase-js');
 
-   const app = express();
-   app.use(cors());
-   app.use(express.json());
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-   const upload = multer({ storage: multer.memoryStorage() });
+// Handles file uploads in memory (no need to save to disk first)
+const upload = multer({ storage: multer.memoryStorage() });
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -123,14 +124,12 @@ app.post('/api/inspections', async (req, res) => {
     return res.status(400).json({ error: 'mine_id and findings are required' });
   }
 
-  // NOTE: not saving GPS location to the database yet — the geography
-  // column needs a specific format from the API and we're isolating
-  // that as a separate fix. For now we just log it to the console.
-  if (latitude && longitude) {
-    console.log(`(inspection GPS captured but not yet saved: ${latitude}, ${longitude})`);
-  }
-
   const insertData = { mine_id, category, findings };
+
+  // Attach real GPS coordinates if the browser provided them
+  if (latitude && longitude) {
+    insertData.location = `SRID=4326;POINT(${longitude} ${latitude})`;
+  }
 
   const { data, error } = await supabase
     .from('inspections')
@@ -351,28 +350,30 @@ app.post('/api/violations/auto-generate', async (req, res) => {
   }
 });
 
+// ============================================================
+// OCR DOCUMENT DIGITIZATION
+// Upload a scanned compliance document (image) and extract its
+// text automatically, so staff don't have to retype it.
+// ============================================================
+app.post('/api/ocr', upload.single('document'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded. Attach an image under the field name "document".' });
+  }
 
-   app.post('/api/ocr', upload.single('document'), async (req, res) => {
-     if (!req.file) {
-       return res.status(400).json({ error: 'No file uploaded. Attach an image under the field name "document".' });
-     }
+  try {
+    const result = await Tesseract.recognize(req.file.buffer, 'eng', {
+      logger: () => {}, // silence progress logs
+    });
 
-     try {
-       const result = await Tesseract.recognize(req.file.buffer, 'eng', {
-         logger: () => {},
-       });
-
-       res.json({
-         extractedText: result.data.text.trim(),
-         confidence: result.data.confidence,
-       });
-     } catch (err) {
-       console.error('OCR error:', err);
-       res.status(500).json({ error: 'Failed to process the document. Try a clearer image.' });
-     }
-   });
-
-   
+    res.json({
+      extractedText: result.data.text.trim(),
+      confidence: result.data.confidence, // 0-100, how sure Tesseract is
+    });
+  } catch (err) {
+    console.error('OCR error:', err);
+    res.status(500).json({ error: 'Failed to process the document. Try a clearer image.' });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
