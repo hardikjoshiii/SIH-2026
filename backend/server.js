@@ -375,6 +375,49 @@ app.post('/api/ocr', upload.single('document'), async (req, res) => {
   }
 });
 
+// ============================================================
+// CONTRACTORS
+// ============================================================
+
+app.get('/api/contractors', async (req, res) => {
+  const { data, error } = await supabase
+    .from('contractors')
+    .select('*, mines(name)')
+    .order('contract_end', { ascending: true });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+app.post('/api/contractors', async (req, res) => {
+  const { mine_id, name, contract_start, contract_end, compliance_doc_url } = req.body;
+  if (!mine_id || !name || !contract_end) {
+    return res.status(400).json({ error: 'mine_id, name, and contract_end are required' });
+  }
+
+  const { data, error } = await supabase
+    .from('contractors')
+    .insert([{ mine_id, name, contract_start, contract_end, compliance_doc_url, status: 'active' }])
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data[0]);
+});
+
+app.patch('/api/contractors/:id/status', async (req, res) => {
+  const { status } = req.body; // 'active' | 'expired' | 'suspended'
+  if (!status) return res.status(400).json({ error: 'status is required' });
+
+  const { data, error } = await supabase
+    .from('contractors')
+    .update({ status })
+    .eq('id', req.params.id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data[0]);
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

@@ -6,12 +6,13 @@ import InspectionForm from './InspectionForm';
 import AlertsPanel from './AlertsPanel';
 import ViolationsPanel from './ViolationsPanel';
 import OCRUpload from './OCRUpload';
-import { API_URL } from './config'
+import ContractorsPanel from './ContractorsPanel';
+import { API_URL } from './config';
 
 const ROLE_TABS = {
-  mine_official: ['dashboard', 'compliance', 'inspection', 'ocr', 'alerts', 'violations'],
-  corporate_admin: ['dashboard', 'map', 'compliance', 'ocr', 'alerts', 'violations'],
-  regulator: ['map', 'compliance', 'alerts', 'violations'],
+  mine_official: ['dashboard', 'compliance', 'inspection', 'ocr', 'contractors', 'alerts', 'violations'],
+  corporate_admin: ['dashboard', 'map', 'compliance', 'ocr', 'contractors', 'alerts', 'violations'],
+  regulator: ['map', 'compliance', 'contractors', 'alerts', 'violations'],
 };
 
 const ROLE_LABELS = {
@@ -26,6 +27,7 @@ const TAB_LABELS = {
   compliance: 'Compliance',
   inspection: 'Inspect',
   ocr: 'Scan Doc',
+  contractors: 'Contractors',
   alerts: 'Alerts',
   violations: 'Violations',
 };
@@ -214,6 +216,9 @@ function App() {
           <InspectionForm mines={mineFilter ? mines.filter((m) => m.id === mineFilter) : mines} />
         )}
         {!loading && !error && tab === 'ocr' && <OCRUpload />}
+        {!loading && !error && tab === 'contractors' && (
+          <ContractorsPanel mines={mines} mineFilter={mineFilter} readOnly={readOnly} />
+        )}
         {!loading && !error && tab === 'alerts' && <AlertsPanel mineFilter={mineFilter} readOnly={readOnly} />}
         {!loading && !error && tab === 'violations' && <ViolationsPanel mineFilter={mineFilter} readOnly={readOnly} />}
       </main>
