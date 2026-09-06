@@ -30,10 +30,10 @@ function MapView({ mines }) {
   return (
     <div className="map-wrapper">
       <MapContainer center={center} zoom={5} style={{ height: '500px', width: '100%', borderRadius: '8px' }}>
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution="&copy; OpenStreetMap contributors &copy; CARTO"
-        />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
         {mines.map((mine) => {
           const coords = COORDS[mine.name];
           if (!coords) return null;
