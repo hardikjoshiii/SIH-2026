@@ -33,6 +33,11 @@ const TAB_LABELS = {
 };
 
 function App() {
+
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+  useEffect(() => {
+  localStorage.setItem('theme', theme);
+  }, [theme]);
   const [mines, setMines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,7 +105,7 @@ function App() {
   const avgRisk = mines.length ? Math.round(mines.reduce((sum, m) => sum + (m.risk_score || 0), 0) / mines.length) : 0;
 
   return (
-    <div className="app-shell">
+   <div className={`app-shell ${theme === 'light' ? 'light-mode' : ''}`}>
       {/* SEAM RAIL — vertical navigation styled as a geological core sample */}
       <aside className="seam-rail">
         <div className="seam-rail-logo" title="Risk distribution across all mines" />
@@ -144,6 +149,15 @@ function App() {
           )}
 
           {readOnly && <span className="readonly-badge">Read-only · Audit View</span>}
+          
+          <button
+          className="secondary-btn"
+          style={{ marginLeft: 'auto' }}
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? '☀ Light Mode' : '🌙 Dark Mode'}
+        </button>
+
         </div>
 
         {loading && <p className="hint">Loading mines...</p>}
@@ -211,7 +225,9 @@ function App() {
         )}
 
         {!loading && !error && tab === 'map' && <MapView mines={mines} />}
-        {!loading && !error && tab === 'compliance' && <ComplianceTracker mineFilter={mineFilter} />}
+        {!loading && !error && tab === 'compliance' && (
+      <ComplianceTracker mines={mineFilter ? mines.filter((m) => m.id === mineFilter) : mines} mineFilter={mineFilter} readOnly={readOnly} />
+)}
         {!loading && !error && tab === 'inspection' && (
           <InspectionForm mines={mineFilter ? mines.filter((m) => m.id === mineFilter) : mines} />
         )}

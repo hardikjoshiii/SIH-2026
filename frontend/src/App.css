@@ -15,6 +15,19 @@
   --risk-low: #4D7C0F;
 }
 
+.app-shell.light-mode {
+  --bg: #EDEAE3;
+  --panel: #FFFFFF;
+  --panel-alt: #F5F2EA;
+  --border: #D8D3C7;
+  --text: #14171A;
+  --text-muted: #5B6067;
+}
+
+.app-shell.light-mode .seam-rail-logo {
+  box-shadow: 0 0 0 1px var(--border);
+}
+
 * { box-sizing: border-box; }
 
 #root {
